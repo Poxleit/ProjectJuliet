@@ -59,6 +59,7 @@ cd ../
 goto check
 
 :update
+cls
 Tools\Git\App\Git\Bin\Git.exe clone git://github.com/Poxleit/ProjectJuliet
 COPY ProjectJuliet\Juliet.bat ".\" /Y
 COPY ProjectJuliet\Tools\UnRAR_32.exe ".\Tools" /Y
