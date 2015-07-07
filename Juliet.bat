@@ -24,7 +24,7 @@ echo.
 echo. All files have been found
 echo. ProjectJuliet will start in 5 seconds.
 ping -n 5 127.0.0.1>nul
-goto boot
+goto update
 
 :gitInstall
 cls
