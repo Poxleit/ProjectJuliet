@@ -4,24 +4,9 @@
 mode con cols=130 lines=40
 
 :start
-set Version=0.3b
+set Version=0.4b
 title ProjectJuliet - %Version%
 IF EXIST ProjectJuliet rmdir /s /q ProjectJuliet
-
-:check
-set fileCheck=true
-cls
-IF EXIST Tools\Git echo. Directory: Git [FOUND]
-IF NOT EXIST Tools\Git echo. Directory: Git [NOT FOUND] && set fileCheck=false
-IF EXIST Tools\CMake echo. Directory: CMAKE [FOUND]
-IF NOT EXIST Tools\CMake echo. Directory: CMAKE [NOT FOUND] && set fileCheck=false
-IF EXIST Tools\mysql.exe echo. File     : MySQL [FOUND]
-IF NOT EXIST Tools\mysql.exe echo. File     : MySQL [NOT FOUND] && set fileCheck=false
-IF EXIST Tools\UnRAR_32.exe echo. File     : WinRAR [FOUND]
-IF NOT EXIST Tools\UnRAR_32.exe echo. File     : WinRAR [NOT FOUND] && set fileCheck=false
-Echo.
-IF /I %fileCheck%==true echo. All files have been found! && Echo. ProjectJuliet will start in 5 seconds... && ping -n 5 127.0.0.1 > nul && goto update
-IF /I %fileCheck%==false echo. Some folders/files are missing, please re-extract them from the RAR file. && echo. Once you're done press a key to restart ProjectJuliet && Pause>nul && goto start
 
 :update
 Tools\git\bin\git.exe clone git://github.com/Poxleit/ProjectJuliet
@@ -30,6 +15,54 @@ COPY ProjectJuliet\Tools\UnRAR_32.exe ".\Tools" /Y
 COPY ProjectJuliet\Tools\mysql.exe ".\Tools" /Y
 IF NOT EXIST Release mkdir Release
 rmdir /s /q ProjectJuliet
+
+:check
+cls
+IF EXIST Tools\Git echo. Directory: Git [FOUND]
+IF NOT EXIST Tools\Git\App\Git\Bin\Git.exe echo. Directory: Git [NOT FOUND] && echo. Project Juliet will now install Git && ping -n 5 127.0.0.1>nul && goto gitInstall
+IF EXIST Tools\CMake echo. Directory: CMAKE [FOUND]
+IF NOT EXIST Tools\CMake echo. Directory: CMake [NOT FOUND] && echo. Project Juliet will now install CMake && ping -n 5 127.0.0.1>nul && goto cmakeInstall
+IF EXIST Tools\mysql.exe echo. File     : MySQL [FOUND]
+IF NOT EXIST Tools\mysql.exe echo. File     : MySQL [NOT FOUND] && goto Update
+IF EXIST Tools\UnRAR_32.exe echo. File     : WinRAR [FOUND]
+IF NOT EXIST Tools\UnRAR_32.exe echo. File     : WinRAR [NOT FOUND] && goto Update
+IF EXIST Install rmdir /s /q Install
+echo.
+echo. All files have been found
+echo. ProjectJuliet will start in 5 seconds.
+ping -n 5 127.0.0.1>nul
+goto boot
+
+:gitInstall
+cls
+IF NOT EXIST Install mkdir Install
+IF NOT EXIST Tools mkdir Tools
+bitsadmin.exe /transfer "Downloading Git" "http://downloads.sourceforge.net/project/gitportable/GitPortable_1.9.4.paf.exe?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fgitportable%2F&ts=1436239333&use_mirror=netcologne" %cd%\Install\Git.exe
+echo. 
+echo. A Git installation window will open in 10 seconds.
+echo. Please install Git in the Tools folder.
+ping -n 10 127.0.0.1 >nul
+cd Install
+Git.exe
+cd ../
+cd tools
+RENAME GitPortable Git
+cd ../
+goto check
+
+:cmakeInstall
+cls
+IF NOT EXIST Install mkdir Install
+IF NOT EXIST Tools mkdir Tools
+bitsadmin.exe /transfer "Downloading CMake" "http://www.cmake.org/files/v3.3/cmake-3.3.0-rc3-win32-x86.exe" %cd%\Install\CMake.exe
+echo. 
+echo. A CMake installation window will open in 10 seconds.
+echo. Please install CMake in the Tools folder.
+ping -n 10 127.0.0.1 >nul
+cd Install
+CMake.exe
+cd ../
+goto check
 
 :boot
 cls
