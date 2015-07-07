@@ -8,17 +8,9 @@ set Version=0.4b
 title ProjectJuliet - %Version%
 IF EXIST ProjectJuliet rmdir /s /q ProjectJuliet
 
-:update
-Tools\git\bin\git.exe clone git://github.com/Poxleit/ProjectJuliet
-COPY ProjectJuliet\Juliet.bat ".\" /Y
-COPY ProjectJuliet\Tools\UnRAR_32.exe ".\Tools" /Y
-COPY ProjectJuliet\Tools\mysql.exe ".\Tools" /Y
-IF NOT EXIST Release mkdir Release
-rmdir /s /q ProjectJuliet
-
 :check
 cls
-IF EXIST Tools\Git echo. Directory: Git [FOUND]
+IF EXIST Tools\Git\App\Git\Bin\Git.exe echo. Directory: Git [FOUND]
 IF NOT EXIST Tools\Git\App\Git\Bin\Git.exe echo. Directory: Git [NOT FOUND] && echo. Project Juliet will now install Git && ping -n 5 127.0.0.1>nul && goto gitInstall
 IF EXIST Tools\CMake echo. Directory: CMAKE [FOUND]
 IF NOT EXIST Tools\CMake echo. Directory: CMake [NOT FOUND] && echo. Project Juliet will now install CMake && ping -n 5 127.0.0.1>nul && goto cmakeInstall
@@ -27,6 +19,7 @@ IF NOT EXIST Tools\mysql.exe echo. File     : MySQL [NOT FOUND] && goto Update
 IF EXIST Tools\UnRAR_32.exe echo. File     : WinRAR [FOUND]
 IF NOT EXIST Tools\UnRAR_32.exe echo. File     : WinRAR [NOT FOUND] && goto Update
 IF EXIST Install rmdir /s /q Install
+SET fileCheck=Done
 echo.
 echo. All files have been found
 echo. ProjectJuliet will start in 5 seconds.
@@ -62,6 +55,16 @@ ping -n 10 127.0.0.1 >nul
 cd Install
 CMake.exe
 cd ../
+goto check
+
+:update
+Tools\Git\App\Git\Bin\Git.exe clone git://github.com/Poxleit/ProjectJuliet
+COPY ProjectJuliet\Juliet.bat ".\" /Y
+COPY ProjectJuliet\Tools\UnRAR_32.exe ".\Tools" /Y
+COPY ProjectJuliet\Tools\mysql.exe ".\Tools" /Y
+IF NOT EXIST Release mkdir Release
+rmdir /s /q ProjectJuliet
+IF %fileCheck%==done goto boot
 goto check
 
 :boot
@@ -141,11 +144,11 @@ mkdir Solution
 cls
 :: Needs updating
 IF EXIST TrinityCore cd TrinityCore && ..\..\Tools\git\bin\git.exe pull git://github.com/TrinityCore/TrinityCore 3.3.5 && cd ../
-IF NOT EXIST TrinityCore ..\Tools\git\bin\git.exe clone -b 3.3.5 git://github.com/TrinityCore/TrinityCore
+IF NOT EXIST TrinityCore ..\Tools\Git\App\Git\Bin\Git.exe clone -b 3.3.5 git://github.com/TrinityCore/TrinityCore
 cls
 cd Solution
-IF /i %Win%==Win32 ..\..\Tools\CMake\bin\cmake.exe cmake --build ..\TrinityCore -G "Visual Studio 12 2013"
-IF /i %Win%==x64 ..\..\Tools\CMake\bin\cmake.exe cmake --build ..\TrinityCore -G "Visual Studio 12 2013 Win64"
+IF /i %Win%==Win32 ..\..\Tools\Git\App\Git\Bin\Git.exe cmake --build ..\TrinityCore -G "Visual Studio 12 2013"
+IF /i %Win%==x64 ..\..\Tools\Git\App\Git\Bin\Git.exe cmake --build ..\TrinityCore -G "Visual Studio 12 2013 Win64"
 cls
 "C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" TrinityCore.sln /t:Rebuild /p:Configuration=%debug%;Platform=%Win% /flp1:logfile=CompileErrors_%debug%_%folder_name%_%Win%.log;errorsonly /flp2:logfile=CompileWarnings_%debug%_%folder_name%_%Win%.log;warningsonly
 echo.
