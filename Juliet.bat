@@ -4,7 +4,7 @@
 mode con cols=130 lines=40
 
 :start
-set Version=0.4b
+set Version=0.45b
 title ProjectJuliet - %Version%
 IF EXIST ProjectJuliet rmdir /s /q ProjectJuliet
 
@@ -72,7 +72,7 @@ IF %fileCheck%==true goto boot
 :boot
 cls
 echo.   
-Echo. Version: %Version%                                                    
+echo. Version: %Version%                                                    
 echo. __________                   __               __         ____.     .__  .__        __   
 echo. \______   \_______  ____    ^|__^| ____   _____/  ^|_      ^|    ^|__ __^|  ^| ^|__^| _____/  ^|_ 
 echo.  ^|     ___/\_  __ \/  _ \   ^|  ^|/ __ \_/ ___\   __\     ^|    ^|  ^|  \  ^| ^|  ^|/ __ \   __\
@@ -101,42 +101,68 @@ goto boot
 
 :trinityStart
 cls
-SET /P TC=Do you want to release (R) or Debug (D) the core (press X to return to start screen) :  
+SET /P TC=Do you want to release (R) or Debug (D) the core (press X to return to start screen) : 
 IF /I %TC%==R SET debug=Release
 IF /I %TC%==D SET debug=debug
 IF /I %TC%==X GOTO boot
 cls
-SET /P W=Do you want a 32bit(Y) or a 64bit(N) core :
+SET /P W=Do you want a 32bit(Y) or a 64bit(N) core (press X to return to the previous screen) : 
 IF /I %W%==Y SET Win=Win32
 IF /I %W%==N SET Win=x64
+IF /I %W%==X GOTO trinityStart
 cls
-Echo ==================================
-Echo Enter your MySQL Information.
-Echo ==================================
+echo ==========================================================
+echo Enter your MySQL Information (Press ENTER for [default]).
+echo ==========================================================
 echo.
-set /p host=MySQL Host:
+set /p host=MySQL Host [localhost]: 
 if %host%. == . set host=localhost
-set /p user=MySQL User:
+set /p user=MySQL User [root]: 
 if %user%. == . set user=root
-set /p pass=MySQL Pass:
+set /p pass=MySQL Pass [ascent]: 
 if %pass%. == . set pass=ascent
-set /p port=MySQL Port:
+set /p port=MySQL Port [3306]: 
 if %port%. == . set port=3306
 cls
-Echo ==================================
-Echo Enter Your Database Information.
-Echo ==================================
-cls
+echo =============================================================
+echo Enter Your Database Information (Press ENTER for [default]).
+echo =============================================================
 echo.
-set /p worlddb=World DB Name:
-if %worlddb%. == . set worlddb=World
-set /p charsdb=Char DB Name:
+set /p worlddb=World DB Name [world]: 
+if %worlddb%. == . set worlddb=world
+set /p charsdb=Char DB Name [characters]: 
 if %charsdb%. == . set charsdb=characters
-set /p authdb=Realm DB Name:
+set /p authdb=Auth DB Name [auth]: 
 if %authdb%. == . set authdb=auth
+:infoCheck
 cls
- 
+echo =====================================
+echo Your MySQL and Database Information
+echo =====================================
+echo.
+echo MySQL Information :
+echo.
+echo MySQL Host : %host%
+echo MySQL User : %user%
+echo MySQL Pass : %pass%
+echo MySQL Port : %port%
+echo.
+echo Database Information :
+echo.
+echo World DB : %worlddb%
+echo Char DB  : %charsdb%
+echo Auth DB  : %authdb%
+echo.
+echo Is the information correct?
+echo Y - Yes, continue
+echo N - No, restart
+SET /P InfCheck=(Y\N) : 
+IF /I %InfCheck%==Y GOTO trinityComp
+IF /I %InfCheck%==N GOTO trinityStart
+GOTO infoCheck
+
 :trinityComp
+cls
 echo. Compiling will start in 5 seconds
 echo. If you made a mistake restart ProjectJuliet now!
 ping -n 5 127.0.0.1 > nul
@@ -149,8 +175,8 @@ IF EXIST TrinityCore cd TrinityCore && ..\..\Tools\git\bin\git.exe pull git://gi
 IF NOT EXIST TrinityCore ..\Tools\Git\App\Git\Bin\Git.exe clone -b 3.3.5 git://github.com/TrinityCore/TrinityCore
 cls
 cd Solution
-IF /i %Win%==Win32 ..\..\Tools\Git\App\Git\Bin\Git.exe cmake --build ..\TrinityCore -G "Visual Studio 12 2013"
-IF /i %Win%==x64 ..\..\Tools\Git\App\Git\Bin\Git.exe cmake --build ..\TrinityCore -G "Visual Studio 12 2013 Win64"
+IF /i %Win%==Win32 ..\..\Tools\CMake\bin\cmake.exe cmake --build ..\TrinityCore -G "Visual Studio 12 2013"
+IF /i %Win%==x64 ..\..\Tools\CMake\bin\cmake.exe cmake --build ..\TrinityCore -G "Visual Studio 12 2013 Win64"
 cls
 "C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" TrinityCore.sln /t:Rebuild /p:Configuration=%debug%;Platform=%Win% /flp1:logfile=CompileErrors_%debug%_%folder_name%_%Win%.log;errorsonly /flp2:logfile=CompileWarnings_%debug%_%folder_name%_%Win%.log;warningsonly
 echo.
