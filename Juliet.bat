@@ -188,9 +188,9 @@ echo. ProjectJuliet will now update your database.
 echo. Please make sure your MySQL server is online.
 pause
 cls
-for %%i in (Release\TrinityCore\sql\updates\world\*_*_*_*_*_*.sql) do echo Importing: %%i & Tools\mysql.exe -q -s -h %host% --user=%user% --password=%pass% --port=%port% --line_numbers %worlddb% < %%i
-for %%i in (Release\TrinityCore\sql\updates\characters\*_*_*_*_*_*.sql) do echo Importing: %%i & Tools\mysql.exe -q -s -h %host% --user=%user% --password=%pass% --port=%port% --line_numbers %charsdb% < %%i
-for %%i in (Release\TrinityCore\sql\updates\auth\*_*_*_*_*_*.sql) do echo Importing: %%i & Tools\mysql.exe -q -s -h %host% --user=%user% --password=%pass% --port=%port% --line_numbers %authdb% < %%i
+for %%i in (Release\TrinityCore\sql\updates\world\*.sql) do echo Importing: %%i & Tools\mysql.exe -q -s -h %host% --user=%user% --password=%pass% --port=%port% --line_numbers %worlddb% < %%i
+for %%i in (Release\TrinityCore\sql\updates\characters\*.sql) do echo Importing: %%i & Tools\mysql.exe -q -s -h %host% --user=%user% --password=%pass% --port=%port% --line_numbers %charsdb% < %%i
+for %%i in (Release\TrinityCore\sql\updates\auth\*.sql) do echo Importing: %%i & Tools\mysql.exe -q -s -h %host% --user=%user% --password=%pass% --port=%port% --line_numbers %authdb% < %%i
 Echo.
 Echo. 
 Echo. ProjectJuliet will continue in 5 seconds
