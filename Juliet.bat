@@ -10,13 +10,11 @@ IF EXIST ProjectJuliet rmdir /s /q ProjectJuliet
 
 :check
 cls
-set fileCheck=false
 IF EXIST Tools\Git\App\Git\Bin\Git.exe echo. Directory: Git [FOUND]
 IF NOT EXIST Tools\Git\App\Git\Bin\Git.exe echo. Directory: Git [NOT FOUND] && echo. Project Juliet will now install Git && ping -n 5 127.0.0.1>nul && goto gitInstall
 IF EXIST Tools\CMake echo. Directory: CMAKE [FOUND]
 IF NOT EXIST Tools\CMake echo. Directory: CMake [NOT FOUND] && echo. Project Juliet will now install CMake && ping -n 5 127.0.0.1>nul && goto cmakeInstall
 IF EXIST Install rmdir /s /q Install
-SET fileCheck=true
 echo.
 echo. All files have been found
 echo. ProjectJuliet will start in 5 seconds.
@@ -62,8 +60,6 @@ COPY ProjectJuliet\Tools\UnRAR_32.exe ".\Tools" /Y
 COPY ProjectJuliet\Tools\mysql.exe ".\Tools" /Y
 IF NOT EXIST Release mkdir Release
 rmdir /s /q ProjectJuliet
-IF %fileCheck%==false goto check
-IF %fileCheck%==true goto boot
 
 :boot
 cls
