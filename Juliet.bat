@@ -58,7 +58,7 @@ Tools\Git\App\Git\Bin\Git.exe clone git://github.com/Poxleit/ProjectJuliet
 COPY ProjectJuliet\Juliet.bat ".\" /Y
 COPY ProjectJuliet\Tools\UnRAR_32.exe ".\Tools" /Y
 COPY ProjectJuliet\Tools\mysql.exe ".\Tools" /Y
-IF NOT EXIST Release mkdir Release
+IF NOT EXIST Cores mkdir Cores
 rmdir /s /q ProjectJuliet
 
 :boot
@@ -77,21 +77,23 @@ echo.
 echo. What would you like to do ?
 echo.
 echo. T - Compile Trinity Core (3.3.5a)
+echo. M - Compile CMaNGOS Core (2.4.3)
 echo. X - Exit
 echo.
 SET /P Option= Enter your choice :
-IF /I %Option%==T GOTO trinityStart
+IF /I %Option%==T GOTO infoFill
+IF /I %Option%==M GOTO infoFill
 IF /I %Option%==X EXIT
 IF /I %Option%==* GOTO invalidChoice
  
 :invalidChoice
 echo.
-echo. Error: You made a invalid Choice!
+echo. Error: You have entered an invalid Choice!
 echo.
 pause
 goto boot
 
-:trinityStart
+:infoFill
 cls
 SET /P TC=Do you want to release (R) or Debug (D) the core (press X to return to start screen) : 
 IF /I %TC%==R SET debug=Release
@@ -101,7 +103,7 @@ cls
 SET /P W=Do you want a 32bit(Y) or a 64bit(N) core (press X to return to the previous screen) : 
 IF /I %W%==Y SET Win=Win32
 IF /I %W%==N SET Win=x64
-IF /I %W%==X GOTO trinityStart
+IF /I %W%==X GOTO infoFill
 cls
 echo ==========================================================
 echo Enter your MySQL Information (Press ENTER for [default]).
@@ -149,33 +151,38 @@ echo Is the information correct?
 echo Y - Yes, continue
 echo N - No, restart
 SET /P InfCheck=(Y\N) : 
-IF /I %InfCheck%==Y GOTO trinityComp
-IF /I %InfCheck%==N GOTO trinityStart
+IF /I %InfCheck%==Y GOTO coreCheck
+IF /I %InfCheck%==N GOTO infoFill
 GOTO infoCheck
+
+:coreCheck
+IF /I %Option%==T GOTO trinityComp
+IF /I %Option%==M goto mangosComp
 
 :trinityComp
 cls
 echo. Compiling will start in 5 seconds
 echo. If you made a mistake restart ProjectJuliet now!
 ping -n 5 127.0.0.1 > nul
-cd Release
-IF EXIST Solution rmdir /s /q Solution
-mkdir Solution
+cd Cores
+IF NOT EXIST TrinityCore mkdir TrinityCore
+cd TrinityCore
+IF EXIST Build rmdir /s /q Build && mkdir Build
 cls
 :: Needs updating
-IF EXIST TrinityCore cd TrinityCore && ..\..\Tools\git\bin\git.exe pull git://github.com/TrinityCore/TrinityCore 3.3.5 && cd ../
-IF NOT EXIST TrinityCore ..\Tools\Git\App\Git\Bin\Git.exe clone -b 3.3.5 git://github.com/TrinityCore/TrinityCore
+IF EXIST TrinityCore cd TrinityCore && ..\..\..\Tools\git\bin\git.exe pull git://github.com/TrinityCore/TrinityCore 3.3.5 && cd ../
+IF NOT EXIST TrinityCore ..\..\Tools\Git\App\Git\Bin\Git.exe clone -b 3.3.5 git://github.com/TrinityCore/TrinityCore
 cls
-cd Solution
-IF /i %Win%==Win32 ..\..\Tools\CMake\bin\cmake.exe cmake --build ..\TrinityCore -G "Visual Studio 12 2013"
-IF /i %Win%==x64 ..\..\Tools\CMake\bin\cmake.exe cmake --build ..\TrinityCore -G "Visual Studio 12 2013 Win64"
+cd Build
+IF /i %Win%==Win32 ..\..\..\Tools\CMake\bin\cmake.exe cmake --build ..\TrinityCore -G "Visual Studio 12 2013"
+IF /i %Win%==x64 ..\..\..\Tools\CMake\bin\cmake.exe cmake --build ..\TrinityCore -G "Visual Studio 12 2013 Win64"
 cls
 "C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" TrinityCore.sln /t:Rebuild /p:Configuration=%debug%;Platform=%Win% /flp1:logfile=CompileErrors_%debug%_%folder_name%_%Win%.log;errorsonly /flp2:logfile=CompileWarnings_%debug%_%folder_name%_%Win%.log;warningsonly
 echo.
 echo. TrinityCore has been compiled.
 echo. If you've experienced any errors during the compile, the core did not compile (issue with the core itself, not ProjectJuliet).
 echo. Warnings are normal.
-cd ../../
+cd ../../../
 
  
 :trinityDB
@@ -197,5 +204,47 @@ Echo. Compiled core is located inside Release\Bin\Release folder.
 echo.
 Pause
 goto boot
+
+:mangosComp
+cls
+echo. Compiling will start in 5 seconds
+echo. If you made a mistake restart ProjectJuliet now!
+ping -n 5 127.0.0.1 > nul
+cd Cores
+IF NOT EXIST MaNGOS mkdir MaNGOS
+cd MaNGOS
+cls
+IF EXIST mangostbc cd mangostbc &&  ..\..\..\Tools\git\App\Git\bin\git.exe pull git://github.com/CoronaCore/OneServer.git && cd ../
+IF NOT EXIST mangostbc ..\..\Tools\Git\App\Git\Bin\Git.exe clone git://github.com/CoronaCore/OneServer.git mangostbc
+IF EXIST mangostbc\src\bindings\ScriptDev2 cd mangostbc\src\bindings\ScriptDev2 && ..\..\..\..\..\..\Tools\git\App\Git\bin\git.exe pull git://github.com/CoronaCore/OneScripts.git && cd ../../../../
+IF NOT EXIST mangostbc\src\bindings\ScriptDev2 ..\..\Tools\Git\App\Git\Bin\Git.exe clone git://github.com/CoronaCore/OneScripts.git mangostbc\src\bindings\ScriptDev2
+cls
+"C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" CMaNGOS.sln /t:Rebuild /p:Configuration=%debug%;Platform=%Win% /flp1:logfile=CompileErrors_%debug%_%folder_name%_%Win%.log;errorsonly /flp2:logfile=CompileWarnings_%debug%_%folder_name%_%Win%.log;warningsonly
+::Needs to also copy and rename .conf files
+echo.
+echo. MaNGOS has been compiled.
+echo. If you've experienced any errors during the compile, the core did not compile (issue with the core itself, not ProjectJuliet).
+echo. Warnings are normal.
+cd ../../../
  
- 
+:mangosDB
+::Needs updates and sd2 functionality 
+goto boot 
+cls
+echo. ProjectJuliet will now update your database.
+echo. Please make sure your MySQL server is online.
+pause
+cls
+for %%i in (Release\mangos-tbc\sql\updates\mangos\*.sql) do echo Importing: %%i & Tools\mysql.exe -q -s -h %host% --user=%user% --password=%pass% --port=%port% --line_numbers %worlddb% < %%i
+for %%i in (Release\mangos-tbc\sql\updates\realmd\*.sql) do echo Importing: %%i & Tools\mysql.exe -q -s -h %host% --user=%user% --password=%pass% --port=%port% --line_numbers %charsdb% < %%i
+for %%i in (Release\mangos-tbc\sql\updates\auth\*.sql) do echo Importing: %%i & Tools\mysql.exe -q -s -h %host% --user=%user% --password=%pass% --port=%port% --line_numbers %authdb% < %%i
+Echo.
+Echo. 
+Echo. ProjectJuliet will continue in 5 seconds
+ping -n 5 127.0.0.1 > nul
+cls
+Echo. Database has been updated!
+Echo. Compiled core is located inside Release\Bin\Release folder.
+echo.
+Pause
+goto boot
