@@ -122,11 +122,11 @@ echo =============================================================
 echo Enter Your Database Information (Press ENTER for [default]).
 echo =============================================================
 echo.
-set /p worlddb=World DB Name [world]: 
+set /p worlddb=World/Mangos DB Name [world]: 
 if %worlddb%. == . set worlddb=world
 set /p charsdb=Char DB Name [characters]: 
 if %charsdb%. == . set charsdb=characters
-set /p authdb=Auth DB Name [auth]: 
+set /p authdb=Auth/Realmd DB Name [auth]: 
 if %authdb%. == . set authdb=auth
 :infoCheck
 cls
@@ -136,16 +136,16 @@ echo =====================================
 echo.
 echo MySQL Information :
 echo.
-echo MySQL Host : %host%
-echo MySQL User : %user%
-echo MySQL Pass : %pass%
-echo MySQL Port : %port%
+echo MySQL Host     : %host%
+echo MySQL User     : %user%
+echo MySQL Pass     : %pass%
+echo MySQL Port     : %port%
 echo.
 echo Database Information :
 echo.
-echo World DB : %worlddb%
-echo Char DB  : %charsdb%
-echo Auth DB  : %authdb%
+echo World/Mangos DB : %worlddb%
+echo Char DB         : %charsdb%
+echo Auth/Realmd DB  : %authdb%
 echo.
 echo Is the information correct?
 echo Y - Yes, continue
@@ -165,12 +165,16 @@ echo. Compiling will start in 5 seconds
 echo. If you made a mistake restart ProjectJuliet now!
 ping -n 5 127.0.0.1 > nul
 cd Cores
-IF NOT EXIST TrinityCore mkdir TrinityCore
-cd TrinityCore
-IF EXIST Build rmdir /s /q Build && mkdir Build
+IF NOT EXIST Trinity mkdir Trinity
+cd Trinity
+IF EXIST Build rmdir /s /q Build
+mkdir Build
 cls
 :: Needs updating
-IF EXIST TrinityCore cd TrinityCore && ..\..\..\Tools\git\bin\git.exe pull git://github.com/TrinityCore/TrinityCore 3.3.5 && cd ../
+:: IF EXIST TrinityCore cd TrinityCore && ..\..\..\Tools\Git\App\Git\Bin\Git.exe pull git://github.com/TrinityCore/TrinityCore 3.3.5 && cd ../
+:: Git fails to recognize the pull command
+:: Temporary workaround by removing TrinityCore folder and forcing a redownload
+rmdir TrinityCore
 IF NOT EXIST TrinityCore ..\..\Tools\Git\App\Git\Bin\Git.exe clone -b 3.3.5 git://github.com/TrinityCore/TrinityCore
 cls
 cd Build
@@ -183,24 +187,26 @@ echo. TrinityCore has been compiled.
 echo. If you've experienced any errors during the compile, the core did not compile (issue with the core itself, not ProjectJuliet).
 echo. Warnings are normal.
 cd ../../../
+pause
+goto trinityDB
 
  
 :trinityDB
-cls
+echo.
 echo. ProjectJuliet will now update your database.
 echo. Please make sure your MySQL server is online.
 pause
 cls
-for %%i in (Release\TrinityCore\sql\updates\world\*.sql) do echo Importing: %%i & Tools\mysql.exe -q -s -h %host% --user=%user% --password=%pass% --port=%port% --line_numbers %worlddb% < %%i
-for %%i in (Release\TrinityCore\sql\updates\characters\*.sql) do echo Importing: %%i & Tools\mysql.exe -q -s -h %host% --user=%user% --password=%pass% --port=%port% --line_numbers %charsdb% < %%i
-for %%i in (Release\TrinityCore\sql\updates\auth\*.sql) do echo Importing: %%i & Tools\mysql.exe -q -s -h %host% --user=%user% --password=%pass% --port=%port% --line_numbers %authdb% < %%i
+for %%i in (Cores\Trinity\TrinityCore\sql\updates\world\*.sql) do echo Importing: %%i & Tools\mysql.exe -q -s -h %host% --user=%user% --password=%pass% --port=%port% --line_numbers %worlddb% < %%i
+for %%i in (Cores\Trinity\TrinityCore\sql\updates\characters\*.sql) do echo Importing: %%i & Tools\mysql.exe -q -s -h %host% --user=%user% --password=%pass% --port=%port% --line_numbers %charsdb% < %%i
+for %%i in (Cores\Trinity\TrinityCore\sql\updates\auth\*.sql) do echo Importing: %%i & Tools\mysql.exe -q -s -h %host% --user=%user% --password=%pass% --port=%port% --line_numbers %authdb% < %%i
 Echo.
 Echo. 
 Echo. ProjectJuliet will continue in 5 seconds
 ping -n 5 127.0.0.1 > nul
 cls
 Echo. Database has been updated!
-Echo. Compiled core is located inside Release\Bin\Release folder.
+Echo. Compiled core is located inside Cores\Trinity\Build\Bin\Release folder.
 echo.
 Pause
 goto boot
@@ -219,32 +225,35 @@ IF NOT EXIST mangostbc ..\..\Tools\Git\App\Git\Bin\Git.exe clone git://github.co
 IF EXIST mangostbc\src\bindings\ScriptDev2 cd mangostbc\src\bindings\ScriptDev2 && ..\..\..\..\..\..\Tools\git\App\Git\bin\git.exe pull git://github.com/CoronaCore/OneScripts.git && cd ../../../../
 IF NOT EXIST mangostbc\src\bindings\ScriptDev2 ..\..\Tools\Git\App\Git\Bin\Git.exe clone git://github.com/CoronaCore/OneScripts.git mangostbc\src\bindings\ScriptDev2
 cls
-"C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" CMaNGOS.sln /t:Rebuild /p:Configuration=%debug%;Platform=%Win% /flp1:logfile=CompileErrors_%debug%_%folder_name%_%Win%.log;errorsonly /flp2:logfile=CompileWarnings_%debug%_%folder_name%_%Win%.log;warningsonly
+"C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" mangostbc\win\mangosdVC120.sln /t:Rebuild /p:Configuration=%debug%;Platform=%Win% /flp1:logfile=CompileErrors_%debug%_%folder_name%_%Win%.log;errorsonly /flp2:logfile=CompileWarnings_%debug%_%folder_name%_%Win%.log;warningsonly
+ping -n 10 127.0.0.1 > nul
+cls
+"C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" mangostbc\src\bindings\ScriptDev2\scriptVC120.sln /t:Rebuild /p:Configuration=%debug%;Platform=%Win% /flp1:logfile=CompileErrors_%debug%_%folder_name%_%Win%.log;errorsonly /flp2:logfile=CompileWarnings_%debug%_%folder_name%_%Win%.log;warningsonly
 ::Needs to also copy and rename .conf files
 echo.
-echo. MaNGOS has been compiled.
+echo. MaNGOS has been compiled and is now located at Cores\MaNGOS\mangostbc\bin\%Win%_Release
 echo. If you've experienced any errors during the compile, the core did not compile (issue with the core itself, not ProjectJuliet).
+echo. Error Log files are located at Cores\MaNGOS.
 echo. Warnings are normal.
-cd ../../../
+cd ../../
+goto mangosDB
  
 :mangosDB
-::Needs updates and sd2 functionality 
-goto boot 
-cls
+::Needs updates and sd2 update functionality 
+echo.
 echo. ProjectJuliet will now update your database.
 echo. Please make sure your MySQL server is online.
 pause
 cls
-for %%i in (Release\mangos-tbc\sql\updates\mangos\*.sql) do echo Importing: %%i & Tools\mysql.exe -q -s -h %host% --user=%user% --password=%pass% --port=%port% --line_numbers %worlddb% < %%i
-for %%i in (Release\mangos-tbc\sql\updates\realmd\*.sql) do echo Importing: %%i & Tools\mysql.exe -q -s -h %host% --user=%user% --password=%pass% --port=%port% --line_numbers %charsdb% < %%i
-for %%i in (Release\mangos-tbc\sql\updates\auth\*.sql) do echo Importing: %%i & Tools\mysql.exe -q -s -h %host% --user=%user% --password=%pass% --port=%port% --line_numbers %authdb% < %%i
-Echo.
-Echo. 
-Echo. ProjectJuliet will continue in 5 seconds
+for %%i in (Cores\MaNGOS\mangostbc\sql\updates\mangos\*.sql) do echo Importing: %%i & Tools\mysql.exe -q -s -h %host% --user=%user% --password=%pass% --port=%port% --line_numbers %worlddb% < %%i
+for %%i in (Cores\MaNGOS\mangostbc\sql\updates\realmd\*.sql) do echo Importing: %%i & Tools\mysql.exe -q -s -h %host% --user=%user% --password=%pass% --port=%port% --line_numbers %charsdb% < %%i
+for %%i in (Cores\MaNGOS\mangostbc\sql\updates\auth\*.sql) do echo Importing: %%i & Tools\mysql.exe -q -s -h %host% --user=%user% --password=%pass% --port=%port% --line_numbers %authdb% < %%i
+echo.
+echo. 
+echo. ProjectJuliet will continue in 5 seconds
 ping -n 5 127.0.0.1 > nul
 cls
-Echo. Database has been updated!
-Echo. Compiled core is located inside Release\Bin\Release folder.
+echo. Database has been updated!
 echo.
 Pause
 goto boot
