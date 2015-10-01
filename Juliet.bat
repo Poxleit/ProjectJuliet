@@ -225,10 +225,12 @@ IF NOT EXIST mangostbc ..\..\Tools\Git\App\Git\Bin\Git.exe clone git://github.co
 IF EXIST mangostbc\src\bindings\ScriptDev2 cd mangostbc\src\bindings\ScriptDev2 && ..\..\..\..\..\..\Tools\git\App\Git\bin\git.exe pull git://github.com/CoronaCore/OneScripts.git && cd ../../../../
 IF NOT EXIST mangostbc\src\bindings\ScriptDev2 ..\..\Tools\Git\App\Git\Bin\Git.exe clone git://github.com/CoronaCore/OneScripts.git mangostbc\src\bindings\ScriptDev2
 cls
-"C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" mangostbc\win\mangosdVC120.sln /t:Rebuild /p:Configuration=%debug%;Platform=%Win% /flp1:logfile=CompileErrors_%debug%_%folder_name%_%Win%.log;errorsonly /flp2:logfile=CompileWarnings_%debug%_%folder_name%_%Win%.log;warningsonly
+IF EXIST "C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" "C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" mangostbc\win\mangosdVC120.sln /t:Rebuild /p:Configuration=%debug%;Platform=%Win% /flp1:logfile=CompileErrors_%debug%_%folder_name%_%Win%.log;errorsonly /flp2:logfile=CompileWarnings_%debug%_%folder_name%_%Win%.log;warningsonly
+IF EXIST "C:\Program Files\MSBuild\12.0\Bin\MSBuild.exe" "C:\Program Files\MSBuild\12.0\Bin\MSBuild.exe"  mangostbc\win\mangosdVC120.sln /t:Rebuild /p:Configuration=%debug%;Platform=%Win% /flp1:logfile=CompileErrors_%debug%_%folder_name%_%Win%.log;errorsonly /flp2:logfile=CompileWarnings_%debug%_%folder_name%_%Win%.log;warningsonly
 ping -n 10 127.0.0.1 > nul
 cls
-"C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" mangostbc\src\bindings\ScriptDev2\scriptVC120.sln /t:Rebuild /p:Configuration=%debug%;Platform=%Win% /flp1:logfile=CompileErrors_%debug%_%folder_name%_%Win%.log;errorsonly /flp2:logfile=CompileWarnings_%debug%_%folder_name%_%Win%.log;warningsonly
+IF EXIST "C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" "C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" mangostbc\src\bindings\ScriptDev2\scriptVC120.sln /t:Rebuild /p:Configuration=%debug%;Platform=%Win% /flp1:logfile=CompileErrors_%debug%_%folder_name%_%Win%.log;errorsonly /flp2:logfile=CompileWarnings_%debug%_%folder_name%_%Win%.log;warningsonly
+IF EXIST "C:\Program Files\MSBuild\12.0\Bin\MSBuild.exe" "C:\Program Files\MSBuild\12.0\Bin\MSBuild.exe" mangostbc\src\bindings\ScriptDev2\scriptVC120.sln /t:Rebuild /p:Configuration=%debug%;Platform=%Win% /flp1:logfile=CompileErrors_%debug%_%folder_name%_%Win%.log;errorsonly /flp2:logfile=CompileWarnings_%debug%_%folder_name%_%Win%.log;warningsonly
 ::Needs to also copy and rename .conf files
 echo.
 echo. MaNGOS has been compiled and is now located at Cores\MaNGOS\mangostbc\bin\%Win%_Release
