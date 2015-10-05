@@ -220,10 +220,10 @@ cd Cores
 IF NOT EXIST MaNGOS mkdir MaNGOS
 cd MaNGOS
 cls
-IF EXIST mangostbc cd mangostbc &&  ..\..\..\Tools\git\App\Git\bin\git.exe pull git://github.com/CoronaCore/OneServer.git && cd ../
-IF NOT EXIST mangostbc ..\..\Tools\Git\App\Git\Bin\Git.exe clone git://github.com/CoronaCore/OneServer.git mangostbc
-IF EXIST mangostbc\src\bindings\ScriptDev2 cd mangostbc\src\bindings\ScriptDev2 && ..\..\..\..\..\..\Tools\git\App\Git\bin\git.exe pull git://github.com/CoronaCore/OneScripts.git && cd ../../../../
-IF NOT EXIST mangostbc\src\bindings\ScriptDev2 ..\..\Tools\Git\App\Git\Bin\Git.exe clone git://github.com/CoronaCore/OneScripts.git mangostbc\src\bindings\ScriptDev2
+IF EXIST mangostbc cd mangostbc &&  ..\..\..\Tools\git\App\Git\bin\git.exe pull git://github.com/Gardiox/ShadowcrownServer.git && cd ../
+IF NOT EXIST mangostbc ..\..\Tools\Git\App\Git\Bin\Git.exe clone git://github.com/Gardiox/ShadowcrownServer.git mangostbc
+IF EXIST mangostbc\src\bindings\ScriptDev2 cd mangostbc\src\bindings\ScriptDev2 && ..\..\..\..\..\..\Tools\git\App\Git\bin\git.exe pull git://github.com/Gardiox/ShadowcrownScripts.git && cd ../../../../
+IF NOT EXIST mangostbc\src\bindings\ScriptDev2 ..\..\Tools\Git\App\Git\Bin\Git.exe clone git://github.com/Gardiox/ShadowcrownScripts.git mangostbc\src\bindings\ScriptDev2
 cls
 IF EXIST "C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" "C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" mangostbc\win\mangosdVC120.sln /t:Rebuild /p:Configuration=%debug%;Platform=%Win% /flp1:logfile=CompileErrors_%debug%_%folder_name%_%Win%.log;errorsonly /flp2:logfile=CompileWarnings_%debug%_%folder_name%_%Win%.log;warningsonly
 IF EXIST "C:\Program Files\MSBuild\12.0\Bin\MSBuild.exe" "C:\Program Files\MSBuild\12.0\Bin\MSBuild.exe"  mangostbc\win\mangosdVC120.sln /t:Rebuild /p:Configuration=%debug%;Platform=%Win% /flp1:logfile=CompileErrors_%debug%_%folder_name%_%Win%.log;errorsonly /flp2:logfile=CompileWarnings_%debug%_%folder_name%_%Win%.log;warningsonly
